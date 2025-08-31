@@ -1,4 +1,4 @@
-﻿namespace BookRental.Models;
+﻿namespace BookRental.Data.Entities;
 
 public class Book
 {

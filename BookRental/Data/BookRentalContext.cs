@@ -1,4 +1,4 @@
-﻿using BookRental.Models;
+﻿using BookRental.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

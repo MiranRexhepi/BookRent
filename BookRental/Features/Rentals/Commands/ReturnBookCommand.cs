@@ -1,5 +1,5 @@
 ﻿using BookRental.Data;
-using BookRental.Models;
+using BookRental.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookRental.Features.Rentals.Commands;

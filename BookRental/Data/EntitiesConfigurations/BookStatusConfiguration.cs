@@ -1,4 +1,4 @@
-﻿using BookRental.Models;
+﻿using BookRental.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

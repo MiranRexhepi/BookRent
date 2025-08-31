@@ -1,6 +1,6 @@
 ﻿using BookRental.Data;
+using BookRental.Data.Entities;
 using BookRental.DTOs;
-using BookRental.Models;
 
 namespace BookRental.Features.Books.Commands;
 

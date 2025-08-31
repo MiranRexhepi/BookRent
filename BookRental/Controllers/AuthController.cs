@@ -1,6 +1,6 @@
-﻿using BookRental.DTOs;
+﻿using BookRental.Data.Entities;
+using BookRental.DTOs;
 using BookRental.Features.Auth.Commands;
-using BookRental.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 

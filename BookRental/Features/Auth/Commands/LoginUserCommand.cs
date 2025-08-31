@@ -1,5 +1,5 @@
-﻿using BookRental.DTOs;
-using BookRental.Models;
+﻿using BookRental.Data.Entities;
+using BookRental.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

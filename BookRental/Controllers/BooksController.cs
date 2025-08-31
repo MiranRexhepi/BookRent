@@ -4,6 +4,7 @@ using BookRental.DTOs;
 using BookRental.Features.Books.Commands;
 using BookRental.Features.Books.Queries;
 using BookRental.Helpers;
+using BookRental.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,27 +15,6 @@ namespace BookRental.Controllers;
 public class BooksController(BookRentalContext context) : ControllerBase
 {
     private readonly BookRentalContext _context = context;
-
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var role = User.GetRoleName();
-
-        if (string.IsNullOrEmpty(role) || role != UserRoles.Admin)
-            return Unauthorized(Messages.YouDontHavePermission);
-
-        var tenantId = User.GetTenantId();
-
-        if (string.IsNullOrEmpty(tenantId))
-            return BadRequest(Messages.MissingTenantId);
-
-        if (!int.TryParse(tenantId, out var tenantIdInt))
-            return BadRequest(Messages.InvalidTenantId);
-
-        var query = new GetAllBooksQuery(_context);
-
-        return Ok(await query.Execute(tenantIdInt));
-    }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
@@ -50,7 +30,9 @@ public class BooksController(BookRentalContext context) : ControllerBase
     }
 
     [HttpGet("available")]
-    public async Task<IActionResult> GetAvailableBooks()
+    public async Task<IActionResult> GetAvailableBooks(
+        [FromQuery] Pagination pagination,
+        [FromQuery] BookFilters filters)
     {
         var tenantId = User.GetTenantId();
 
@@ -62,7 +44,7 @@ public class BooksController(BookRentalContext context) : ControllerBase
 
         var query = new GetTenantAvailableBooks(_context);
 
-        var books = await query.Execute(tenantIdInt);
+        var books = await query.Execute(tenantIdInt, pagination, filters);
 
         if (books == null)
             return NotFound();

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace BookRental.Models;
+namespace BookRental.Data.Entities;
 
 public class User : IdentityUser
 {

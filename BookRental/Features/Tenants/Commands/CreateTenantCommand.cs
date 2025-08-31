@@ -1,8 +1,8 @@
 ﻿using BookRental.Constants;
 using BookRental.Data;
+using BookRental.Data.Entities;
 using BookRental.DTOs;
 using BookRental.Features.Auth.Commands;
-using BookRental.Models;
 
 namespace BookRental.Features.Tenants.Commands;
 

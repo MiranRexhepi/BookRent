@@ -1,5 +1,5 @@
 using BookRental.Data;
-using BookRental.Models;
+using BookRental.Data.Entities;
 using BookRental.Worker;
 using BookRental.WS;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
