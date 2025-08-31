@@ -112,4 +112,27 @@ public class BooksController(BookRentalContext context) : ControllerBase
 
         return result ? Ok(Messages.BookDeletedSuccessfully) : NotFound();
     }
+
+    [HttpGet("columns/{column}")]
+    public async Task<IActionResult> GetBooksBySelectedColumn(
+        [FromRoute] string column,
+        [FromQuery] Pagination pagination)
+    {
+        var tenantId = User.GetTenantId();
+
+        if (string.IsNullOrEmpty(tenantId))
+            return BadRequest(Messages.MissingTenantId);
+
+        if (!int.TryParse(tenantId, out var tenantIdInt))
+            return BadRequest(Messages.InvalidTenantId);
+
+        var query = new GetBooksBySelectedColumn(_context);
+
+        var books = await query.Execute(tenantIdInt, column, pagination);
+
+        if (books == null)
+            return NotFound();
+
+        return Ok(books);
+    }
 }
