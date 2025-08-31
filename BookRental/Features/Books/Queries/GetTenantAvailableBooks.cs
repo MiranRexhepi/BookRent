@@ -20,13 +20,7 @@ public class GetTenantAvailableBooks(BookRentalContext context)
                         && (string.IsNullOrEmpty(filters.Genre) || x.Genre == filters.Genre)
                         && (string.IsNullOrEmpty(filters.Author) || x.Author == filters.Author)
                         && (string.IsNullOrEmpty(pagination.Search) || x.Title.ToUpper().Contains(pagination.Search.ToUpper().Trim()) || x.ISBN.ToUpper().Contains(pagination.Search.ToUpper().Trim()))
-            );
-
-        var totalItems = await query.CountAsync();
-
-        var items = await query
-            .Skip((pagination.PageNumber - 1) * pagination.PageSize)
-            .Take(pagination.PageSize)
+            )
             .Select(b => new BookDto
             {
                 Id = b.Id,
@@ -35,7 +29,13 @@ public class GetTenantAvailableBooks(BookRentalContext context)
                 Genre = b.Genre,
                 ISBN = b.ISBN,
                 TenantId = b.TenantId
-            })
+            });
+
+        var totalItems = await query.CountAsync();
+
+        var items = await query
+            .Skip((pagination.PageNumber - 1) * pagination.PageSize)
+            .Take(pagination.PageSize)
             .ToListAsync();
 
         return new PaginatedResponse<BookDto>

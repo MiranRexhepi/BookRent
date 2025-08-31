@@ -23,19 +23,12 @@ public class TenantsController(
     [HttpPost]
     public async Task<IActionResult> CreateTenant([FromBody] CreateTenantDto dto)
     {
-        try
-        {
-            var registerUserCommand = new RegisterUserCommand(_userManager, _roleManager, _configuration);
+        var registerUserCommand = new RegisterUserCommand(_userManager, _roleManager, _configuration);
 
-            var command = new CreateTenantCommand(_context, registerUserCommand);
+        var command = new CreateTenantCommand(_context, registerUserCommand);
 
-            var token = await command.Execute(dto);
+        var token = await command.Execute(dto);
 
-            return Ok(new { Token = token });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Error = ex.Message });
-        }
+        return Ok(new { Token = token });
     }
 }

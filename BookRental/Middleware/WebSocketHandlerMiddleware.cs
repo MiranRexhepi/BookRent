@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace BookRental.WS;
+namespace BookRental.Middleware;
 
 public class WebSocketHandlerMiddleware(RequestDelegate next, IOptionsMonitor<JwtBearerOptions> jwtOptions)
 {

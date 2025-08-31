@@ -17,14 +17,12 @@ public class BooksController(BookRentalContext context) : ControllerBase
     private readonly BookRentalContext _context = context;
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(
+        [FromRoute] int id)
     {
         var query = new GetBookByIdQuery(_context);
 
         var book = await query.Execute(id);
-
-        if (book == null)
-            return NotFound();
 
         return Ok(book);
     }
@@ -36,29 +34,18 @@ public class BooksController(BookRentalContext context) : ControllerBase
     {
         var tenantId = User.GetTenantId();
 
-        if (string.IsNullOrEmpty(tenantId))
-            return BadRequest(Messages.MissingTenantId);
-
-        if (!int.TryParse(tenantId, out var tenantIdInt))
-            return BadRequest(Messages.InvalidTenantId);
-
         var query = new GetTenantAvailableBooks(_context);
 
-        var books = await query.Execute(tenantIdInt, pagination, filters);
-
-        if (books == null)
-            return NotFound();
+        var books = await query.Execute(tenantId, pagination, filters);
 
         return Ok(books);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateBookDto dto)
+    public async Task<IActionResult> Create(
+        [FromBody] CreateBookDto dto)
     {
-        var role = User.GetRoleName();
-
-        if (role != UserRoles.Admin)
-            return Unauthorized(Messages.YouDontHavePermission);
+        User.IsAdmin();
 
         var command = new CreateBookCommand(_context);
 
@@ -68,49 +55,34 @@ public class BooksController(BookRentalContext context) : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UpdateBookDto dto)
+    public async Task<IActionResult> Update(
+        [FromRoute] int id,
+        [FromBody] UpdateBookDto dto)
     {
-        var role = User.GetRoleName();
-
-        if (role != UserRoles.Admin)
-            return Unauthorized(Messages.YouDontHavePermission);
+        User.IsAdmin();
 
         var tenantId = User.GetTenantId();
-
-        if (string.IsNullOrEmpty(tenantId))
-            return BadRequest(Messages.MissingTenantId);
-
-        if (!int.TryParse(tenantId, out var tenantIdInt))
-            return BadRequest(Messages.InvalidTenantId);
 
         var command = new UpdateBookCommand(_context);
 
-        var result = await command.Execute(id, tenantIdInt, dto);
+        await command.Execute(id, tenantId, dto);
 
-        return result ? NoContent() : NotFound();
+        return Ok(Messages.BookUpdatedSuccessfully);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(
+        [FromRoute] int id)
     {
-        var role = User.GetRoleName();
-
-        if (role != UserRoles.Admin)
-            return Unauthorized(Messages.YouDontHavePermission);
+        User.IsAdmin();
 
         var tenantId = User.GetTenantId();
 
-        if (string.IsNullOrEmpty(tenantId))
-            return BadRequest(Messages.MissingTenantId);
-
-        if (!int.TryParse(tenantId, out var tenantIdInt))
-            return BadRequest(Messages.InvalidTenantId);
-
         var command = new DeleteBookCommand(_context);
 
-        var result = await command.Execute(id, tenantIdInt);
+        await command.Execute(id, tenantId);
 
-        return result ? Ok(Messages.BookDeletedSuccessfully) : NotFound();
+        return Ok(Messages.BookDeletedSuccessfully);
     }
 
     [HttpGet("columns/{column}")]
@@ -120,18 +92,9 @@ public class BooksController(BookRentalContext context) : ControllerBase
     {
         var tenantId = User.GetTenantId();
 
-        if (string.IsNullOrEmpty(tenantId))
-            return BadRequest(Messages.MissingTenantId);
-
-        if (!int.TryParse(tenantId, out var tenantIdInt))
-            return BadRequest(Messages.InvalidTenantId);
-
         var query = new GetBooksBySelectedColumn(_context);
 
-        var books = await query.Execute(tenantIdInt, column, pagination);
-
-        if (books == null)
-            return NotFound();
+        var books = await query.Execute(tenantId, column, pagination);
 
         return Ok(books);
     }

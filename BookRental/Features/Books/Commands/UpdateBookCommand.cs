@@ -1,4 +1,5 @@
-﻿using BookRental.Data;
+﻿using BookRental.Constants;
+using BookRental.Data;
 using BookRental.DTOs;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +9,7 @@ public class UpdateBookCommand(BookRentalContext context)
 {
     private readonly BookRentalContext _context = context;
 
-    public async Task<bool> Execute(int id, int tenantId, UpdateBookDto dto)
+    public async Task Execute(int id, int tenantId, UpdateBookDto dto)
     {
         await _context.Books
             .Where(x => x.Id == id && x.TenantId == tenantId && !x.IsDeleted)
@@ -20,6 +21,7 @@ public class UpdateBookCommand(BookRentalContext context)
 
         var res = await _context.SaveChangesAsync();
 
-        return res > 1;
+        if (res < 1)
+            throw new KeyNotFoundException(Messages.BookNotFound);
     }
 }

@@ -1,4 +1,5 @@
-﻿using BookRental.Data;
+﻿using BookRental.Constants;
+using BookRental.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookRental.Features.Books.Commands;
@@ -7,7 +8,7 @@ public class DeleteBookCommand(BookRentalContext context)
 {
     private readonly BookRentalContext _context = context;
 
-    public async Task<bool> Execute(int id, int tenantId)
+    public async Task Execute(int id, int tenantId)
     {
         await _context.Books
             .Where(x => x.Id == id && x.TenantId == tenantId && !x.IsDeleted)
@@ -16,6 +17,7 @@ public class DeleteBookCommand(BookRentalContext context)
 
         var res = await _context.SaveChangesAsync();
 
-        return res > 0;
+        if (res < 1)
+            throw new KeyNotFoundException(Messages.BookNotFound);
     }
 }

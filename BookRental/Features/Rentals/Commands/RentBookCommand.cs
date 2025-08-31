@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookRental.Features.Rentals.Commands;
 
-public class RentBookCommand(BookRentalContext context, BookRental.WS.WebSocketManager wsManager)
+public class RentBookCommand(BookRentalContext context, Middleware.WebSocketManager wsManager)
 {
     private readonly BookRentalContext _context = context;
-    private readonly BookRental.WS.WebSocketManager _wsManager = wsManager;
+    private readonly Middleware.WebSocketManager _wsManager = wsManager;
 
     public async Task Execute(int tenantId, int bookId, string userId)
     {

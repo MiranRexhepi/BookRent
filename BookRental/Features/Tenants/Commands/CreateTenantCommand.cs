@@ -27,11 +27,10 @@ public class CreateTenantCommand(
         {
             Email = dto.UserEmail,
             Password = dto.Password,
-            TenantId = tenant.Id,
             Role = UserRoles.Admin
         };
 
-        var token = await _registerUserCommand.Execute(registerDto);
+        var token = await _registerUserCommand.Execute(registerDto, tenant.Id);
 
         return token;
     }

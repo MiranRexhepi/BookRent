@@ -1,7 +1,7 @@
 using BookRental.Data;
 using BookRental.Data.Entities;
+using BookRental.Middleware;
 using BookRental.Worker;
-using BookRental.WS;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -60,7 +60,7 @@ builder.Services.AddControllers();
 builder.Services.AddHostedService<OverdueBookCheck>();
 
 // WebSocket
-builder.Services.AddSingleton<BookRental.WS.WebSocketManager>();
+builder.Services.AddSingleton<BookRental.Middleware.WebSocketManager>();
 
 // Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -113,6 +113,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseWebSockets();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<WebSocketHandlerMiddleware>();
 
 app.UseHttpsRedirection();

@@ -1,4 +1,5 @@
-﻿using BookRental.Data.Entities;
+﻿using BookRental.Constants;
+using BookRental.Data.Entities;
 using BookRental.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -15,15 +16,12 @@ public class LoginUserCommand(UserManager<User> userManager, IConfiguration conf
 
     public async Task<string?> Execute(LoginDto dto)
     {
-        var user = await _userManager.FindByEmailAsync(dto.Email);
-
-        if (user == null)
-            return null;
+        var user = await _userManager.FindByEmailAsync(dto.Email) ?? throw new UnauthorizedAccessException(Messages.UserNotFound);
 
         var validPassword = await _userManager.CheckPasswordAsync(user, dto.Password);
 
         if (!validPassword)
-            return null;
+            throw new UnauthorizedAccessException(Messages.InvalidPassword);
 
         var roles = await _userManager.GetRolesAsync(user);
 

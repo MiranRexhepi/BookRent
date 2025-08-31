@@ -1,7 +1,7 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
 
-namespace BookRental.WS;
+namespace BookRental.Middleware;
 public class WebSocketManager
 {
     private readonly List<WebSocket> _sockets = [];

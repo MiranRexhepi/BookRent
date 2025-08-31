@@ -16,7 +16,7 @@ public class RegisterUserCommand(
     private readonly RoleManager<IdentityRole> _roleManager = roleManager;
     private readonly IConfiguration _configuration = configuration;
 
-    public async Task<string> Execute(RegisterDto dto)
+    public async Task<string> Execute(RegisterDto dto, int tenantId)
     {
         var existingUser = await _userManager.FindByEmailAsync(dto.Email);
 
@@ -30,7 +30,7 @@ public class RegisterUserCommand(
         {
             UserName = dto.Email,
             Email = dto.Email,
-            TenantId = dto.TenantId
+            TenantId = tenantId
         };
 
         var result = await _userManager.CreateAsync(user, dto.Password);

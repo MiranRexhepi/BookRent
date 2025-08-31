@@ -1,4 +1,5 @@
-﻿using BookRental.Data;
+﻿using BookRental.Constants;
+using BookRental.Data;
 using BookRental.DTOs;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,6 @@ public class GetBookByIdQuery(BookRentalContext context)
                 ISBN = b.ISBN,
                 TenantId = b.TenantId
             })
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync() ?? throw new KeyNotFoundException(Messages.BookNotFound);
     }
 }
