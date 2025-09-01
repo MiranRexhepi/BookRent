@@ -1,5 +1,5 @@
 export async function loginUser(username, password) {
-  const response = await fetch("https://localhost:7032/api/login", {
+  const response = await fetch(`${API_URL}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email: username, password }),
@@ -11,7 +11,7 @@ export async function loginUser(username, password) {
 }
 
 export async function registerUser(username, password, role) {
-  const response = await fetch("https://localhost:7032/api/register", {
+  const response = await fetch(`${API_URL}/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -29,7 +29,7 @@ export function getToken() {
 }
 
 export async function tenantRegister(username, password, name) {
-  const response = await fetch("https://localhost:7032/api/tenants", {
+  const response = await fetch(`${API_URL}/tenants`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -44,4 +44,5 @@ export async function tenantRegister(username, password, name) {
   return data;
 }
 
-export const API_URL = "https://localhost:7032/api";
+export const API_URL = "http://bookrental-api:8080/api";
+export const API_URL_WSS = "wss://bookrental-api:8080";

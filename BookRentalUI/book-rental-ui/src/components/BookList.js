@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { getBooks } from "../Services/bookService";
 import "../css/BookList.css";
 import { rentBook } from "../Services/rentalService";
-import { getToken } from "../Services/authService";
+import { API_URL, API_URL_WSS, getToken } from "../Services/authService";
 import ScrollDropdown from "./ScrollDropdown";
 
 export default function BookList({ user }) {
@@ -78,7 +78,7 @@ export default function BookList({ user }) {
       socketRef.current = null;
     }
 
-    ws = new WebSocket(`wss://localhost:7032/ws?token=${token}`);
+    ws = new WebSocket(`${API_URL_WSS}/ws?token=${token}`);
     socketRef.current = ws;
 
     ws.onopen = () => {
@@ -123,13 +123,13 @@ export default function BookList({ user }) {
         if (!token) return;
 
         const [titlesRes, authorsRes, genresRes] = await Promise.all([
-          fetch("https://localhost:7032/api/books/columns/Title", {
+          fetch(`${API_URL}/books/columns/Title`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch("https://localhost:7032/api/books/columns/Author", {
+          fetch(`${API_URL}/books/columns/Author`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch("https://localhost:7032/api/books/columns/Genre", {
+          fetch(`${API_URL}/books/columns/Genre`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -211,7 +211,7 @@ export default function BookList({ user }) {
       if (!token) return;
 
       const res = await fetch(
-        `https://localhost:7032/api/books/columns/${type}?PageNumber=${page}&PageSize=10`,
+        `${API_URL}/books/columns/${type}?PageNumber=${page}&PageSize=10`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();
@@ -260,17 +260,14 @@ export default function BookList({ user }) {
         return;
       }
 
-      const response = await fetch(
-        `https://localhost:7032/api/books/${editingBook.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(`${API_URL}/books/${editingBook.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
 
       if (!response.ok) throw new Error("Failed to update book.");
 
@@ -299,15 +296,12 @@ export default function BookList({ user }) {
         return;
       }
 
-      const response = await fetch(
-        `https://localhost:7032/api/books/${bookId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/books/${bookId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok) throw new Error("Failed to delete book.");
 
@@ -333,7 +327,7 @@ export default function BookList({ user }) {
         available: true,
       };
 
-      const response = await fetch(`https://localhost:7032/api/books`, {
+      const response = await fetch(`${API_URL}/books`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
