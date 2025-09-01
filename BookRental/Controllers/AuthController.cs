@@ -38,6 +38,6 @@ public class AuthController(
 
         var token = await command.Execute(dto);
 
-        return Ok(new { token });
+        return Ok(token);
     }
 }

@@ -10,11 +10,14 @@ export async function loginUser(username, password) {
   return data;
 }
 
-export async function registerUser(username, password) {
+export async function registerUser(username, password, role) {
   const response = await fetch("https://localhost:7032/api/register", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: username, password }),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    },
+    body: JSON.stringify({ Email: username, Password: password, Role: role }),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Register failed");

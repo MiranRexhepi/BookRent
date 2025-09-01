@@ -1,31 +1,73 @@
-import React, { useState } from 'react';
-import { registerUser } from '../Services/authService';
+// Register.js
+import React, { useState } from "react";
+import { registerUser } from "../Services/authService";
 
-export default function Register({ onRegister }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+export default function Register({ onRegister, onClose }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("Client");
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
+    setMessage("");
+
     try {
-      const data = await registerUser(username, password);
+      const data = await registerUser(email, password, role);
+      setMessage("✅ Registration successful!");
       onRegister(data);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "❌ Registration failed");
     }
   };
 
   return (
-    <div className="login-container">
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
-        <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required />
-        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
-        <button type="submit">Register</button>
-      </form>
-      {error && <p className="message">{error}</p>}
+    <div className="modal-overlay">
+      <div className="modal">
+        <h3>Register</h3>
+
+        <form onSubmit={handleSubmit}>
+          <label>
+            Email:
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </label>
+
+          <label>
+            Password:
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </label>
+
+          <label>
+            Role:
+            <select value={role} onChange={(e) => setRole(e.target.value)}>
+              <option value="Client">Client</option>
+              <option value="Admin">Admin</option>
+            </select>
+          </label>
+
+          <div className="modal-buttons">
+            <button type="submit">Register</button>
+            <button type="button" onClick={onClose}>
+              Cancel
+            </button>
+          </div>
+        </form>
+
+        {error && <p className="message">{error}</p>}
+        {message && <p className="message success">{message}</p>}
+      </div>
     </div>
   );
 }

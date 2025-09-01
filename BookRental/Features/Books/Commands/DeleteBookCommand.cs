@@ -10,14 +10,14 @@ public class DeleteBookCommand(BookRentalContext context)
 
     public async Task Execute(int id, int tenantId)
     {
-        await _context.Books
+        var affectedRows = await _context.Books
             .Where(x => x.Id == id && x.TenantId == tenantId && !x.IsDeleted)
             .ExecuteUpdateAsync(x => x
                     .SetProperty(b => b.IsDeleted, true));
 
-        var res = await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
 
-        if (res < 1)
+        if (affectedRows < 1)
             throw new KeyNotFoundException(Messages.BookNotFound);
     }
 }

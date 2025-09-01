@@ -1,22 +1,45 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function Navbar({ user, onLogout }) {
+export default function Navbar({ user, onLogout, onShowRegister }) {
   return (
     <nav className="navbar">
       <h2 className="navbar-logo">📚 BookRental</h2>
       <div className="navbar-links">
         <Link to="/">Books</Link>
+
         {user ? (
           <>
-            {user.role === "Admin" && <Link to="/add-book">Add Book</Link>}
-            <Link to="/rentals">My Rentals</Link>
+            {user.role === "Admin" ? (
+              <>
+                <span
+                  className="navbar-link"
+                  onClick={onShowRegister}
+                  style={{
+                    cursor: "pointer",
+                    color: "#61dafb",
+                    margin: "0 1rem",
+                  }}
+                >
+                  Register
+                </span>
+                <Link to="/rentals">Rental History</Link>
+              </>
+            ) : (
+              <Link to="/rentals">My Rentals</Link>
+            )}
             <button onClick={onLogout}>Logout</button>
           </>
         ) : (
           <>
             <Link to="/login">Login</Link>
-            <Link to="/register">Register</Link>
+            <span
+              className="navbar-link"
+              onClick={onShowRegister}
+              style={{ cursor: "pointer", color: "#61dafb", margin: "0 1rem" }}
+            >
+              Register
+            </span>
             <Link to="/tenant/register">Tenant Register</Link>
           </>
         )}

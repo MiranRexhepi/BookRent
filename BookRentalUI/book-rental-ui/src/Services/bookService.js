@@ -25,7 +25,7 @@ export async function getBooks(params) {
 }
 
 export async function addBook(book) {
-  const response = await fetch(API_URL, {
+  const response = await fetch(API_URL + "/books", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -33,5 +33,28 @@ export async function addBook(book) {
     },
     body: JSON.stringify(book),
   });
+  return await response.json();
+}
+
+export async function updateBook(id, book) {
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    },
+    body: JSON.stringify({
+      title: book.title,
+      author: book.author,
+      genre: book.genre,
+      isbn: book.isbn,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData?.message || "Failed to update book.");
+  }
+
   return await response.json();
 }

@@ -13,9 +13,6 @@ public class CreateBookDto
     [RegularExpression(@"^(?:\d{9}[\dXx]|\d{13})$", ErrorMessage = "Invalid ISBN format.")]
     public required string ISBN { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "TenantId must be a positive integer.")]
-    public int TenantId { get; set; }
-
     [StringLength(100, ErrorMessage = "Author name cannot exceed 100 characters.")]
     public required string Author { get; set; }
 }

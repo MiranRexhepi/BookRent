@@ -10,10 +10,10 @@ public class CreateBookCommand(BookRentalContext context)
 {
     private readonly BookRentalContext _context = context;
 
-    public async Task<BookDto> Execute(CreateBookDto dto)
+    public async Task<BookDto> Execute(CreateBookDto dto, int tenantId)
     {
-        var tenantExists = await _context.Users
-            .AnyAsync(u => u.TenantId == dto.TenantId);
+        var tenantExists = await _context.Tenants
+            .AnyAsync(u => u.Id == tenantId);
 
         if (!tenantExists)
         {
@@ -26,7 +26,7 @@ public class CreateBookCommand(BookRentalContext context)
             Author = dto.Author,
             Genre = dto.Genre,
             ISBN = dto.ISBN,
-            TenantId = dto.TenantId,
+            TenantId = tenantId,
             BookStatusId = (int)Enums.BookStatus.Available
         };
 
@@ -41,7 +41,8 @@ public class CreateBookCommand(BookRentalContext context)
             Author = book.Author,
             Genre = book.Genre,
             ISBN = book.ISBN,
-            TenantId = book.TenantId
+            TenantId = book.TenantId,
+            Status = Enums.BookStatus.Available
         };
     }
 }

@@ -14,7 +14,7 @@ public class LoginUserCommand(UserManager<User> userManager, IConfiguration conf
     private readonly UserManager<User> _userManager = userManager;
     private readonly IConfiguration _configuration = configuration;
 
-    public async Task<string?> Execute(LoginDto dto)
+    public async Task<object?> Execute(LoginDto dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email) ?? throw new UnauthorizedAccessException(Messages.UserNotFound);
 
@@ -55,6 +55,10 @@ public class LoginUserCommand(UserManager<User> userManager, IConfiguration conf
             signingCredentials: creds
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        return new
+        {
+            token = new JwtSecurityTokenHandler().WriteToken(token),
+            role = roles.First()
+        };
     }
 }

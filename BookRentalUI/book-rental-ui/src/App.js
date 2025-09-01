@@ -12,12 +12,12 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import RegisterTenant from "./components/TenantRegister";
 import RentalHistory from "./components/RentalHistory";
-import AddBook from "./components/AddBook";
 import BookList from "./components/BookList";
 import RentBook from "./components/RentBook";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
 
   const handleLogout = () => {
     setUser(null);
@@ -27,7 +27,24 @@ function App() {
   return (
     <Router>
       <div className="App">
-        {user && <Navbar user={user} onLogout={handleLogout} />}
+        {user && (
+          <Navbar
+            user={user}
+            onLogout={handleLogout}
+            onShowRegister={() => setShowRegisterModal(true)}
+          />
+        )}
+
+        {showRegisterModal && (
+          <Register
+            onRegister={(data) => {
+              setUser(data);
+              setShowRegisterModal(false);
+            }}
+            onClose={() => setShowRegisterModal(false)}
+          />
+        )}
+
         {!user ? (
           <div className="centered-container">
             <Routes>
@@ -36,22 +53,12 @@ function App() {
                 element={<RegisterTenant onTenantRegister={setUser} />}
               />
               <Route path="/login" element={<Login onLogin={setUser} />} />
-              <Route
-                path="/register"
-                element={<Register onRegister={setUser} />}
-              />
               <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
           </div>
         ) : (
           <Routes>
-            <Route path="/" element={<BookList />} />
-            <Route
-              path="/add-book"
-              element={
-                user.role === "Admin" ? <AddBook /> : <Navigate to="/" />
-              }
-            />
+            <Route path="/" element={<BookList user={user} />} />
             <Route path="/rentals" element={<RentalHistory />} />
             <Route path="/rent" element={<RentBook />} />
             <Route path="*" element={<Navigate to="/" replace />} />

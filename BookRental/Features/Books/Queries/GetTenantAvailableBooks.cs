@@ -29,7 +29,8 @@ public class GetTenantAvailableBooks(BookRentalContext context)
                 Genre = b.Genre,
                 ISBN = b.ISBN,
                 TenantId = b.TenantId
-            });
+            })
+            .OrderByDescending(x => x.Id);
 
         var totalItems = await query.CountAsync();
 
