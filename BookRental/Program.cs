@@ -56,6 +56,18 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
+// CORS policies
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("CORSPolicies",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+        });
+});
+
 // Worker
 builder.Services.AddHostedService<OverdueBookCheck>();
 
@@ -109,6 +121,8 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "BookRental API V1");
 });
 
+app.UseCors("CORSPolicies");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -118,7 +132,6 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<WebSocketHandlerMiddleware>();
 
 app.UseHttpsRedirection();
-
 
 app.MapControllers();
 

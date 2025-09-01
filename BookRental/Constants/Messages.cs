@@ -14,6 +14,7 @@ public static class Messages
     #region Tenant
     public const string MissingTenantId = "Missing tenantId";
     public const string InvalidTenantId = "Invalid tenantId";
+    public const string TenantNotFound = "Tenant not found";
     #endregion
 
     #region Books

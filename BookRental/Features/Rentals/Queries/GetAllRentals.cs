@@ -9,7 +9,7 @@ public class GetAllRentals(BookRentalContext context)
 {
     private readonly BookRentalContext _context = context;
 
-    public async Task<IEnumerable<RentalDto>> Execute()
+    public async Task<IEnumerable<RentalDto>> Execute(string userId)
     {
         return await _context.Rentals
             .Select(b =>
@@ -21,6 +21,8 @@ public class GetAllRentals(BookRentalContext context)
                     RentedAt = b.RentedAt,
                     RentalStatus = (RentalStatus)b.RentalStatusId
                 })
+            .Where(x => x.UserId == userId)
+            .OrderByDescending(x => x.Id)
             .ToListAsync();
     }
 }

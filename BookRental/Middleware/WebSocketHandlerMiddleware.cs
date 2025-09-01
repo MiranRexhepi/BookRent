@@ -25,19 +25,23 @@ public class WebSocketHandlerMiddleware(RequestDelegate next, IOptionsMonitor<Jw
             return;
         }
 
-        var authHeader = context
-            .Request
-            .Headers
-            .Authorization
-            .ToString();
+        var authHeader = context.Request.Headers.Authorization.ToString();
+        string? token = null;
 
-        if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+        {
+            token = authHeader["Bearer ".Length..].Trim();
+        }
+        else if (context.Request.Query.ContainsKey("token"))
+        {
+            token = context.Request.Query["token"];
+        }
+
+        if (string.IsNullOrEmpty(token))
         {
             context.Response.StatusCode = 401;
             return;
         }
-
-        var token = authHeader["Bearer ".Length..].Trim();
 
         var validationParameters = _jwtOptions
             .Get(JwtBearerDefaults.AuthenticationScheme)
@@ -46,7 +50,6 @@ public class WebSocketHandlerMiddleware(RequestDelegate next, IOptionsMonitor<Jw
         try
         {
             var handler = new JwtSecurityTokenHandler();
-
             var principal = handler.ValidateToken(token, validationParameters, out var validatedToken);
 
             var userId = principal.GetUserId();

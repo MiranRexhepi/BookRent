@@ -1,6 +1,8 @@
-﻿using BookRental.Data;
+﻿using BookRental.Constants;
+using BookRental.Data;
 using BookRental.Data.Entities;
 using BookRental.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookRental.Features.Books.Commands;
 
@@ -10,6 +12,14 @@ public class CreateBookCommand(BookRentalContext context)
 
     public async Task<BookDto> Execute(CreateBookDto dto)
     {
+        var tenantExists = await _context.Users
+            .AnyAsync(u => u.TenantId == dto.TenantId);
+
+        if (!tenantExists)
+        {
+            throw new InvalidOperationException(Messages.TenantNotFound);
+        }
+
         var book = new Book
         {
             Title = dto.Title,

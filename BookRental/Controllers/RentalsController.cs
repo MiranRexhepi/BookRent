@@ -6,6 +6,7 @@ using BookRental.Helpers;
 using BookRental.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace BookRental.Controllers;
 
@@ -31,6 +32,18 @@ public class RentalsController(
         return Ok(history);
     }
 
+    [HttpGet("current")]
+    public async Task<IActionResult> GetCurrentRentalHistory()
+    {
+        var userId = User.GetUserId();
+
+        var query = new GetAllRentals(_context);
+
+        var history = await query.Execute(userId);
+
+        return Ok(history);
+    }
+
     [HttpPost("books/{bookId}")]
     public async Task<IActionResult> RentBook(
         [FromRoute] int bookId)
@@ -43,7 +56,7 @@ public class RentalsController(
 
         await command.Execute(tenantId, bookId, userId);
 
-        return Ok(Messages.BookRentedSuccessfully);
+        return Ok(JsonSerializer.Serialize(Messages.BookRentedSuccessfully));
     }
 
     [HttpPut("{id}/books/{bookId}")]
@@ -53,10 +66,10 @@ public class RentalsController(
 
         var userId = User.GetUserId();
 
-        var command = new ReturnBookCommand(_context);
+        var command = new ReturnBookCommand(_context, _wsManager);
 
         await command.Execute(tenantId, bookId, userId, id);
 
-        return Ok(Messages.BookReturnedSuccessfully);
+        return Ok(JsonSerializer.Serialize(Messages.BookReturnedSuccessfully));
     }
 }

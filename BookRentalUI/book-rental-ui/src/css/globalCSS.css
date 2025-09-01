@@ -1,0 +1,46 @@
+.App {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #282c34;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.login-container {
+  background: #3b3f46;
+  padding: 2rem;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 300px;
+}
+
+.login-container h2 {
+  margin-bottom: 1rem;
+}
+
+.login-container input {
+  width: 100%;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  border-radius: 5px;
+  border: none;
+}
+
+.login-container button {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 1rem;
+  border-radius: 5px;
+  border: none;
+  background-color: #61dafb;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.login-container .message {
+  margin-top: 1rem;
+  color: #ff6b6b;
+}

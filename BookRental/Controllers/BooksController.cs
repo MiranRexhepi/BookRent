@@ -7,6 +7,7 @@ using BookRental.Helpers;
 using BookRental.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace BookRental.Controllers;
 
@@ -67,7 +68,7 @@ public class BooksController(BookRentalContext context) : ControllerBase
 
         await command.Execute(id, tenantId, dto);
 
-        return Ok(Messages.BookUpdatedSuccessfully);
+        return Ok(JsonSerializer.Serialize(Messages.BookUpdatedSuccessfully));
     }
 
     [HttpDelete("{id}")]
@@ -82,7 +83,7 @@ public class BooksController(BookRentalContext context) : ControllerBase
 
         await command.Execute(id, tenantId);
 
-        return Ok(Messages.BookDeletedSuccessfully);
+        return Ok(JsonSerializer.Serialize(Messages.BookDeletedSuccessfully));
     }
 
     [HttpGet("columns/{column}")]

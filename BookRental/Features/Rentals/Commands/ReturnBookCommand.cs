@@ -4,9 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookRental.Features.Rentals.Commands;
 
-public class ReturnBookCommand(BookRentalContext context)
+public class ReturnBookCommand(BookRentalContext context, Middleware.WebSocketManager wsManager)
 {
     private readonly BookRentalContext _context = context;
+    private readonly Middleware.WebSocketManager _wsManager = wsManager;
 
     public async Task Execute(int tenantId, int bookId, string userId, int rentalId)
     {
@@ -40,5 +41,12 @@ public class ReturnBookCommand(BookRentalContext context)
         await _context.RentalLogs.AddAsync(rentalLog);
 
         await _context.SaveChangesAsync();
+
+        await _wsManager.BroadcastAsync(
+            new
+            {
+                BookId = bookId,
+                Status = (int)Enums.RentalStatus.Returned
+            });
     }
 }

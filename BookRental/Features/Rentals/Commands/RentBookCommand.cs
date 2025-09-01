@@ -86,7 +86,12 @@ public class RentBookCommand(BookRentalContext context, Middleware.WebSocketMana
 
         await _context.SaveChangesAsync();
 
-        await _wsManager.BroadcastAsync($"Book rented: {bookId} by user {userId}");
+        await _wsManager.BroadcastAsync(
+            new
+            {
+                BookId = bookId,
+                Status = (int)Enums.RentalStatus.Rented
+            });
     }
 }
 

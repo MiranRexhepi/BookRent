@@ -1,5 +1,6 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
 
 namespace BookRental.Middleware;
 public class WebSocketManager
@@ -16,9 +17,11 @@ public class WebSocketManager
         _sockets.Remove(socket);
     }
 
-    public async Task BroadcastAsync(string message)
+    public async Task BroadcastAsync(object payload)
     {
-        var buffer = Encoding.UTF8.GetBytes(message);
+        var jsonMessage = JsonSerializer.Serialize(payload);
+
+        var buffer = Encoding.UTF8.GetBytes(jsonMessage);
 
         foreach (var socket in _sockets.ToList())
         {
