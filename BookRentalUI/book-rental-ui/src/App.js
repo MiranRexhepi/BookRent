@@ -14,6 +14,7 @@ import RegisterTenant from "./components/TenantRegister";
 import RentalHistory from "./components/RentalHistory";
 import BookList from "./components/BookList";
 import RentBook from "./components/RentBook";
+import AllRentalHistory from "./components/AllRentalHistory";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -60,6 +61,7 @@ function App() {
           <Routes>
             <Route path="/" element={<BookList user={user} />} />
             <Route path="/rentals" element={<RentalHistory />} />
+            <Route path="/rentals/all" element={<AllRentalHistory />} />
             <Route path="/rent" element={<RentBook />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

@@ -23,7 +23,7 @@ export default function Navbar({ user, onLogout, onShowRegister }) {
                 >
                   Register
                 </span>
-                <Link to="/rentals">Rental History</Link>
+                <Link to="/rentals/all">Rental History</Link>
               </>
             ) : (
               <Link to="/rentals">My Rentals</Link>

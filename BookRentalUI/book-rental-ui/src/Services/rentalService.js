@@ -33,3 +33,12 @@ export async function getRentalHistory() {
   const data = await response.json();
   return data;
 }
+
+export async function getAllRentalHistory(params) {
+  const query = new URLSearchParams(params).toString();
+  const response = await fetch(`${API_URL}/rentals/history?${query}`, {
+    headers: { Authorization: `Bearer ${getToken()}` },
+  });
+  const data = await response.json();
+  return data;
+}

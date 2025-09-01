@@ -3,11 +3,11 @@ import { getBooks } from "../Services/bookService";
 import "../css/BookList.css";
 import { rentBook } from "../Services/rentalService";
 import { getToken } from "../Services/authService";
+import ScrollDropdown from "./ScrollDropdown";
 
 export default function BookList({ user }) {
   const [books, setBooks] = useState([]);
   const [search, setSearch] = useState("");
-  const [genreFilter, setGenreFilter] = useState("All");
   const [message, setMessage] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize] = useState(10);
@@ -22,7 +22,25 @@ export default function BookList({ user }) {
     isbn: "",
   });
 
+  const [titleOptions, setTitleOptions] = useState([]);
+  const [authorOptions, setAuthorOptions] = useState([]);
+  const [genreOptions, setGenreOptions] = useState([]);
+
+  const [filters, setFilters] = useState({
+    Title: "",
+    Author: "",
+    Genre: "",
+  });
+
+  const [titlePage, setTitlePage] = useState(1);
+  const [authorPage, setAuthorPage] = useState(1);
+  const [genrePage, setGenrePage] = useState(1);
+
   const [addingBook, setAddingBook] = useState(false);
+
+  const titleRef = useRef();
+  const authorRef = useRef();
+  const genreRef = useRef();
 
   const openModal = (book) => {
     setEditingBook(book);
@@ -49,7 +67,7 @@ export default function BookList({ user }) {
       return;
     }
     loadBooks();
-  }, [pageNumber, genreFilter, search, token]);
+  }, [pageNumber, search, token]);
 
   useEffect(() => {
     if (!token) return;
@@ -98,14 +116,74 @@ export default function BookList({ user }) {
     };
   }, [token]);
 
-  const loadBooks = async () => {
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        const token = getToken();
+        if (!token) return;
+
+        const [titlesRes, authorsRes, genresRes] = await Promise.all([
+          fetch("https://localhost:7032/api/books/columns/Title", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch("https://localhost:7032/api/books/columns/Author", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch("https://localhost:7032/api/books/columns/Genre", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        const [titles, authors, genres] = await Promise.all([
+          titlesRes.json(),
+          authorsRes.json(),
+          genresRes.json(),
+        ]);
+
+        setTitleOptions(titles?.items);
+        setAuthorOptions(authors?.items);
+        setGenreOptions(genres?.items);
+      } catch (err) {
+        console.error("Failed to load filter options:", err);
+      }
+    };
+
+    loadFilters();
+  }, [token]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const el = titleRef.current;
+      if (!el) return;
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 5) {
+        setTitlePage((prev) => prev + 1);
+      }
+    };
+    const el = titleRef.current;
+    if (el) el.addEventListener("scroll", handleScroll);
+    return () => el?.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    loadFilterItems("Title", titlePage);
+  }, [titlePage]);
+
+  useEffect(() => {
+    loadFilterItems("Author", authorPage);
+  }, [authorPage]);
+
+  useEffect(() => {
+    loadFilterItems("Genre", genrePage);
+  }, [genrePage]);
+
+  const loadBooks = async (filters = {}) => {
     if (!token) return;
 
     const params = {
       PageNumber: pageNumber,
       PageSize: pageSize,
       Search: search,
-      Genre: genreFilter !== "All" ? genreFilter : "",
+      ...filters,
     };
 
     try {
@@ -115,6 +193,37 @@ export default function BookList({ user }) {
     } catch (err) {
       console.error(err);
       setMessage("❌ Failed to load books.");
+    }
+  };
+
+  const handleFilterChange = (type, value) => {
+    setPageNumber(1);
+
+    const newFilters = { ...filters, [type]: value };
+    setFilters(newFilters);
+
+    // Call loadBooks with latest filters
+    loadBooks(newFilters);
+  };
+
+  const loadFilterItems = async (type, page) => {
+    try {
+      if (!token) return;
+
+      const res = await fetch(
+        `https://localhost:7032/api/books/columns/${type}?PageNumber=${page}&PageSize=10`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const data = await res.json();
+
+      if (!data.items) return;
+
+      if (type === "Title") setTitleOptions((prev) => [...prev, ...data.items]);
+      if (type === "Author")
+        setAuthorOptions((prev) => [...prev, ...data.items]);
+      if (type === "Genre") setGenreOptions((prev) => [...prev, ...data.items]);
+    } catch (err) {
+      console.error("Failed to load filter items", err);
     }
   };
 
@@ -260,28 +369,42 @@ export default function BookList({ user }) {
       {message && <p className="message">{message}</p>}
 
       <div className="filters">
-        <input
-          type="text"
-          placeholder="Search by title, author, or ISBN..."
-          value={search}
-          onChange={(e) => {
-            setPageNumber(1);
-            setSearch(e.target.value);
-          }}
-        />
-        <select
-          value={genreFilter}
-          onChange={(e) => {
-            setPageNumber(1);
-            setGenreFilter(e.target.value);
-          }}
-        >
-          {genres.map((g, idx) => (
-            <option key={idx} value={g}>
-              {g}
-            </option>
-          ))}
-        </select>
+        <div className="scroll-dropdown search-dropdown">
+          <input
+            type="text"
+            className="selected" // same class as the selected div in ScrollDropdown
+            placeholder="Search by title, author, or ISBN..."
+            value={search}
+            onChange={(e) => {
+              setPageNumber(1);
+              setSearch(e.target.value);
+            }}
+          />
+        </div>
+        <div className="filters" style={{ display: "flex", gap: "1rem" }}>
+          <div className="filters-horizontal">
+            <ScrollDropdown
+              items={titleOptions}
+              value={filters.Title}
+              onChange={(val) => handleFilterChange("Title", val)}
+              placeholder="Select Title"
+            />
+
+            <ScrollDropdown
+              items={authorOptions}
+              value={filters.Author}
+              onChange={(val) => handleFilterChange("Author", val)}
+              placeholder="Select Author"
+            />
+
+            <ScrollDropdown
+              items={genreOptions}
+              value={filters.Genre}
+              onChange={(val) => handleFilterChange("Genre", val)}
+              placeholder="Select Genre"
+            />
+          </div>
+        </div>
       </div>
       {user?.role === "Admin" && (
         <div className="add-book-btn">

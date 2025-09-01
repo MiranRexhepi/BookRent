@@ -8,5 +8,6 @@ public class RentalDto
     public int BookId { get; set; }
     public required string UserId { get; set; }
     public DateTime RentedAt { get; set; }
+    public DateTime? ReturnedAt { get; set; }
     public RentalStatus RentalStatus { get; set; }
 }

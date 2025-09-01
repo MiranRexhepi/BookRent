@@ -1,5 +1,6 @@
 ﻿using BookRental.Data;
 using BookRental.DTOs;
+using BookRental.Enums;
 using BookRental.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,18 +10,21 @@ public class GetRentalHistoryQuery(BookRentalContext context)
 {
     private readonly BookRentalContext _context = context;
 
-    public async Task<PaginatedResponse<RentalLogDto>> Execute(int tenantId, Pagination pagination)
+    public async Task<PaginatedResponse<RentalDto>> Execute(int tenantId, Pagination pagination)
     {
         var query = _context.RentalLogs
             .Where(log => log.Rental.Book.TenantId == tenantId)
             .Select(b =>
-                new RentalLogDto
-                {
-                    Id = b.Id,
-                    RentalId = b.RentalId,
-                    RentalStatusId = b.RentalStatusId,
-                    CreatedAt = b.CreatedAt
-                });
+               new RentalDto
+               {
+                   Id = b.Id,
+                   BookId = b.Rental.BookId,
+                   UserId = b.Rental.UserId,
+                   RentedAt = b.Rental.RentedAt,
+                   ReturnedAt = (RentalStatus)b.RentalStatusId == RentalStatus.Returned ? b.Rental.ReturnedAt : null,
+                   RentalStatus = (RentalStatus)b.RentalStatusId
+               })
+            .OrderByDescending(x => x.Id);
 
         var totalItems = await query.CountAsync();
 
@@ -29,7 +33,7 @@ public class GetRentalHistoryQuery(BookRentalContext context)
             .Take(pagination.PageSize)
             .ToListAsync();
 
-        return new PaginatedResponse<RentalLogDto>
+        return new PaginatedResponse<RentalDto>
         {
             Items = items,
             TotalItems = totalItems,
