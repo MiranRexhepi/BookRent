@@ -1,4 +1,5 @@
-﻿using BookRental.Data;
+﻿using BookRental.Constants;
+using BookRental.Data;
 using BookRental.Data.Entities;
 using BookRental.DTOs;
 using BookRental.Features.Auth.Commands;
@@ -29,6 +30,6 @@ public class TenantsController(
 
         var token = await command.Execute(dto);
 
-        return Ok(new { Token = token });
+        return Ok(new { Token = token, Role = UserRoles.Admin });
     }
 }

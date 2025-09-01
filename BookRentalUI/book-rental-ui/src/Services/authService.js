@@ -44,5 +44,5 @@ export async function tenantRegister(username, password, name) {
   return data;
 }
 
-export const API_URL = "http://bookrental-api:8080/api";
-export const API_URL_WSS = "wss://bookrental-api:8080";
+export const API_URL = "http://localhost:5000/api";
+export const API_URL_WSS = "wss://localhost:5000";
