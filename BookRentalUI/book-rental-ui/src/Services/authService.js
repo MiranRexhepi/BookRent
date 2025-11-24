@@ -45,4 +45,4 @@ export async function tenantRegister(username, password, name) {
 }
 
 export const API_URL = "http://localhost:5000/api";
-export const API_URL_WSS = "wss://localhost:5000";
+export const API_URL_WSS = "ws://localhost:5000";
