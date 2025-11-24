@@ -7,6 +7,7 @@ export default function Navbar({ user, onLogout, onShowRegister }) {
       <h2 className="navbar-logo">📚 BookRental</h2>
       <div className="navbar-links">
         <Link to="/">Books</Link>
+        {user && <Link to="/books/infinite">Browse (Infinite)</Link>}
 
         {user ? (
           <>
