@@ -13,6 +13,7 @@ public class BookRentalContext(DbContextOptions<BookRentalContext> options) : Id
     public DbSet<Rental> Rentals { get; set; }
     public DbSet<RentalStatus> RentalStatuses { get; set; }
     public DbSet<RentalLog> RentalLogs { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

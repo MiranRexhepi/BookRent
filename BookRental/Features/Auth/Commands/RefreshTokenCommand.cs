@@ -1,4 +1,4 @@
-﻿using BookRental.Constants;
+using BookRental.Constants;
 using BookRental.Data;
 using BookRental.Data.Entities;
 using BookRental.DTOs;
@@ -11,24 +11,38 @@ using System.Text;
 
 namespace BookRental.Features.Auth.Commands;
 
-public class LoginUserCommand(UserManager<User> userManager, IConfiguration configuration, BookRentalContext context, TokenService tokenService)
+public class RefreshTokenCommand(UserManager<User> userManager, IConfiguration configuration, BookRentalContext context, TokenService tokenService)
 {
     private readonly UserManager<User> _userManager = userManager;
     private readonly IConfiguration _configuration = configuration;
     private readonly BookRentalContext _context = context;
     private readonly TokenService _tokenService = tokenService;
 
-    public async Task<object?> Execute(LoginDto dto)
+    public async Task<object?> Execute(RefreshTokenDto dto)
     {
-        var user = await _userManager.FindByEmailAsync(dto.Email) ?? throw new UnauthorizedAccessException(Messages.UserNotFound);
+        // Find the refresh token
+        var refreshTokenEntity = await _context.RefreshTokens
+            .Include(rt => rt.User)
+            .FirstOrDefaultAsync(rt => rt.Token == dto.RefreshToken);
 
-        var validPassword = await _userManager.CheckPasswordAsync(user, dto.Password);
+        if (refreshTokenEntity == null)
+            throw new UnauthorizedAccessException("Invalid refresh token.");
 
-        if (!validPassword)
-            throw new UnauthorizedAccessException(Messages.InvalidPassword);
+        // Validate refresh token
+        if (refreshTokenEntity.IsRevoked)
+            throw new UnauthorizedAccessException("Refresh token has been revoked.");
 
+        if (refreshTokenEntity.ExpiresAt < DateTime.UtcNow)
+            throw new UnauthorizedAccessException("Refresh token has expired.");
+
+        var user = refreshTokenEntity.User;
+        if (user == null)
+            throw new UnauthorizedAccessException("User not found.");
+
+        // Get user roles
         var roles = await _userManager.GetRolesAsync(user);
 
+        // Generate new access token
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, user.UserName ?? ""),
@@ -48,7 +62,6 @@ public class LoginUserCommand(UserManager<User> userManager, IConfiguration conf
             throw new InvalidOperationException("JWT key is not configured.");
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
-
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
@@ -59,38 +72,31 @@ public class LoginUserCommand(UserManager<User> userManager, IConfiguration conf
             signingCredentials: creds
         );
 
-        // Generate refresh token
-        var refreshToken = _tokenService.GenerateRefreshToken();
-        var refreshTokenExpiry = DateTime.UtcNow.AddDays(1); // Refresh token expires in 7 days
+        // Generate new refresh token
+        var newRefreshToken = _tokenService.GenerateRefreshToken();
+        var refreshTokenExpiry = DateTime.UtcNow.AddDays(7);
 
-        // Revoke existing refresh tokens for this user
-        var existingTokens = await _context.RefreshTokens
-            .Where(rt => rt.UserId == user.Id && !rt.IsRevoked && rt.ExpiresAt > DateTime.UtcNow)
-            .ToListAsync();
-
-        foreach (var existingToken in existingTokens)
-        {
-            existingToken.IsRevoked = true;
-        }
+        // Revoke old refresh token
+        refreshTokenEntity.IsRevoked = true;
 
         // Save new refresh token
-        var refreshTokenEntity = new RefreshToken
+        var newRefreshTokenEntity = new RefreshToken
         {
-            Token = refreshToken,
+            Token = newRefreshToken,
             UserId = user.Id,
             ExpiresAt = refreshTokenExpiry,
             CreatedAt = DateTime.UtcNow,
             IsRevoked = false
         };
 
-        _context.RefreshTokens.Add(refreshTokenEntity);
+        _context.RefreshTokens.Add(newRefreshTokenEntity);
         await _context.SaveChangesAsync();
 
         return new
         {
             token = new JwtSecurityTokenHandler().WriteToken(token),
-            refreshToken,
-            role = roles.First()
+            refreshToken = newRefreshToken
         };
     }
 }
+

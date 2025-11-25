@@ -74,6 +74,9 @@ builder.Services.AddHostedService<OverdueBookCheck>();
 // WebSocket
 builder.Services.AddSingleton<BookRental.Middleware.WebSocketManager>();
 
+// Token Service
+builder.Services.AddScoped<TokenService>();
+
 // Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
