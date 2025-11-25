@@ -1,10 +1,8 @@
-import { API_URL, getToken } from "./authService";
+import { API_URL, authenticatedFetch } from "./authService";
 
 export async function getBooks(params) {
   const query = new URLSearchParams(params).toString();
-  const response = await fetch(`${API_URL}/books/available?${query}`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const response = await authenticatedFetch(`${API_URL}/books/available?${query}`);
 
   const data = await response.json();
 
@@ -25,11 +23,10 @@ export async function getBooks(params) {
 }
 
 export async function addBook(book) {
-  const response = await fetch(API_URL + "/books", {
+  const response = await authenticatedFetch(API_URL + "/books", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${getToken()}`,
     },
     body: JSON.stringify(book),
   });
@@ -37,11 +34,10 @@ export async function addBook(book) {
 }
 
 export async function updateBook(id, book) {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const response = await authenticatedFetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${getToken()}`,
     },
     body: JSON.stringify({
       title: book.title,

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { getBooks } from "../Services/bookService";
 import "../css/BookList.css";
 import { rentBook } from "../Services/rentalService";
-import { API_URL, API_URL_WSS, getToken } from "../Services/authService";
+import { API_URL, API_URL_WSS, getToken, authenticatedFetch } from "../Services/authService";
 import ScrollDropdown from "./ScrollDropdown";
 
 export default function BookList({ user }) {
@@ -123,15 +123,9 @@ export default function BookList({ user }) {
         if (!token) return;
 
         const [titlesRes, authorsRes, genresRes] = await Promise.all([
-          fetch(`${API_URL}/books/columns/Title`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch(`${API_URL}/books/columns/Author`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch(`${API_URL}/books/columns/Genre`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          authenticatedFetch(`${API_URL}/books/columns/Title`),
+          authenticatedFetch(`${API_URL}/books/columns/Author`),
+          authenticatedFetch(`${API_URL}/books/columns/Genre`),
         ]);
 
         const [titles, authors, genres] = await Promise.all([
@@ -260,11 +254,10 @@ export default function BookList({ user }) {
         return;
       }
 
-      const response = await fetch(`${API_URL}/books/${editingBook.id}`, {
+      const response = await authenticatedFetch(`${API_URL}/books/${editingBook.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -296,11 +289,8 @@ export default function BookList({ user }) {
         return;
       }
 
-      const response = await fetch(`${API_URL}/books/${bookId}`, {
+      const response = await authenticatedFetch(`${API_URL}/books/${bookId}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       if (!response.ok) throw new Error("Failed to delete book.");
@@ -327,11 +317,10 @@ export default function BookList({ user }) {
         available: true,
       };
 
-      const response = await fetch(`${API_URL}/books`, {
+      const response = await authenticatedFetch(`${API_URL}/books`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });

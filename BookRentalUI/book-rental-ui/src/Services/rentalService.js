@@ -1,11 +1,8 @@
-import { API_URL, getToken } from "./authService";
+import { API_URL, authenticatedFetch } from "./authService";
 
 export async function rentBook(bookId) {
-  const response = await fetch(`${API_URL}/rentals/books/${bookId}`, {
+  const response = await authenticatedFetch(`${API_URL}/rentals/books/${bookId}`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
-    },
   });
   const data = response;
   console.log("🚀 ~ rentssBook ~ ressssponse:", data);
@@ -18,27 +15,22 @@ export async function rentBook(bookId) {
 }
 
 export async function returnBook(id, bookId) {
-  const response = await fetch(`${API_URL}/rentals/${id}/books/${bookId}`, {
+  const response = await authenticatedFetch(`${API_URL}/rentals/${id}/books/${bookId}`, {
     method: "PUT",
-    headers: { Authorization: `Bearer ${getToken()}` },
   });
   const data = await response.json();
   return data;
 }
 
 export async function getRentalHistory() {
-  const response = await fetch(`${API_URL}/rentals/current`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const response = await authenticatedFetch(`${API_URL}/rentals/current`);
   const data = await response.json();
   return data;
 }
 
 export async function getAllRentalHistory(params) {
   const query = new URLSearchParams(params).toString();
-  const response = await fetch(`${API_URL}/rentals/history?${query}`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const response = await authenticatedFetch(`${API_URL}/rentals/history?${query}`);
   const data = await response.json();
   return data;
 }

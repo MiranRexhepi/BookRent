@@ -1,9 +1,7 @@
-import { API_URL, getToken } from "./authService";
+import { API_URL, authenticatedFetch } from "./authService";
 
 export async function getDashboardStats() {
-  const response = await fetch(`${API_URL}/dashboard/stats`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const response = await authenticatedFetch(`${API_URL}/dashboard/stats`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch dashboard stats");
@@ -13,9 +11,7 @@ export async function getDashboardStats() {
 }
 
 export async function getDailyRentalStats() {
-  const response = await fetch(`${API_URL}/dashboard/daily-rentals`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const response = await authenticatedFetch(`${API_URL}/dashboard/daily-rentals`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch daily rental stats");
@@ -26,9 +22,7 @@ export async function getDailyRentalStats() {
 
 export async function getRentalHistory(params) {
   const query = new URLSearchParams(params).toString();
-  const response = await fetch(`${API_URL}/dashboard/rental-history?${query}`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const response = await authenticatedFetch(`${API_URL}/dashboard/rental-history?${query}`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch rental history");
@@ -39,9 +33,7 @@ export async function getRentalHistory(params) {
 
 export async function getAvailableBooks(params) {
   const query = new URLSearchParams(params).toString();
-  const response = await fetch(`${API_URL}/dashboard/available-books?${query}`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const response = await authenticatedFetch(`${API_URL}/dashboard/available-books?${query}`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch available books");
