@@ -13,6 +13,7 @@ export default function Navbar({ user, onLogout, onShowRegister }) {
           <>
             {user.role === "Admin" ? (
               <>
+                <Link to="/dashboard">Dashboard</Link>
                 <span
                   className="navbar-link"
                   onClick={onShowRegister}

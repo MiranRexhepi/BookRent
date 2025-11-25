@@ -16,6 +16,7 @@ import BookList from "./components/BookList";
 import RentBook from "./components/RentBook";
 import AllRentalHistory from "./components/AllRentalHistory";
 import BookListInfinite from "./components/BookListInfinite";
+import Dashboard from "./components/Dashboard";
 import { getToken } from "./Services/authService";
 
 function App() {
@@ -92,6 +93,9 @@ function App() {
             <Route path="/rentals" element={<RentalHistory />} />
             <Route path="/rentals/all" element={<AllRentalHistory />} />
             <Route path="/rent" element={<RentBook />} />
+            {user.role === "Admin" && (
+              <Route path="/dashboard" element={<Dashboard />} />
+            )}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         )}
